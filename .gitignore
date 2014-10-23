@@ -1,0 +1,5 @@
+[Bb]in
+[Ii]nclude
+[Ll]ib
+__pycache__
+*.pyc
