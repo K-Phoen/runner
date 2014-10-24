@@ -12,5 +12,6 @@ setup(
     author_email='contact@kevingomez.fr',
     license=open('LICENSE').read(),
     packages=['runner'],
-    scripts=['scripts/runner-convert', 'scripts/runner-merge'],
+    scripts=['scripts/runner-convert', 'scripts/runner-merge',
+             'scripts/runner-edit'],
 )

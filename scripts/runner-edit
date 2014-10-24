@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+
+import argparse
+from runner import dump_to_file, parse_from_file, TimeEditor
+
+def configure_common_args(parser):
+    parser.add_argument(
+        '-i', '--input', type=str, required=True,
+        help='File to read from.',
+    )
+    parser.add_argument(
+        '-o', '--output', type=str, required=True,
+        help='File to write the output to.',
+    )
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Edit FIT and TCX files'
+    )
+
+    # add editors parsers
+    subparsers = parser.add_subparsers()
+
+    # time editor
+    time_parser = subparsers.add_parser('time', help='Edit time entries')
+    configure_common_args(time_parser)
+    TimeEditor.configure_args_parser(time_parser)
+
+    return parser.parse_args()
+
+def main():
+    options = parse_args()
+    editor = options.editor()
+
+    # read the original file
+    activity = parse_from_file(options.input)
+
+    # edit the activity
+    editor.edit(activity, options)
+
+    # write the edited activity
+    dump_to_file(activity, options.output)
+
+if __name__ == '__main__':
+    main()
