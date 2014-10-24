@@ -1,9 +1,15 @@
 #!/usr/bin/env python
 
-import time
+import fitparse, time
+
 from dumper import TCXDumper
 from fusion import Fusion
-from parser import TCXParser
+from parser import parse_file
+
+
+cardio_activity = parse_file('data/2014-10-23_18-05-54_4_48.fit')
+dumper = TCXDumper()
+dumper.dump_to_file(cardio_activity, 'lala_fit.tcx')
 
 def date_to_timestamp(date):
     return int(time.mktime(date.timetuple()))
@@ -17,9 +23,8 @@ def report(activity, name):
     print('Started at: %s (%d)' % (activity.started_at, timestamp_start))
     print('Completed at: %s (%d)\n' % (activity.completed_at, timestamp_end))
 
-parser = TCXParser()
-main_activity = parser.parse('data/main.tcx')
-cardio_activity = parser.parse('data/cardio.tcx')
+main_activity = parse_file('data/main.tcx')
+cardio_activity = parse_file('data/cardio.tcx')
 
 # print a few info on the two activities
 report(main_activity, 'MAIN')

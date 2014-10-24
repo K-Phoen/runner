@@ -45,7 +45,7 @@ class Activity:
     def __repr__(self):
         return '<Activity: id "%s" of type "%s" (%d laps)>' % (
             self.identifier,
-            self.type,
+            "Unknown" if self.type is None else self.type,
             len(self.laps)
         )
 
@@ -86,10 +86,11 @@ class Lap:
         return max(trackpoint.time for trackpoint in self.trackpoints)
 
     def __repr__(self):
-        return '<Lap: started at %s; duration %d sec; %d meters>' % (
+        return '<Lap: started at %s; duration %d sec; %d meters (%d trackpoints)>' % (
             self.start_time,
             self.duration,
-            self.distance
+            self.distance,
+            len(self.trackpoints)
         )
 
 class Trackpoint:
