@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+import os
+
+class DumperNotFoundError(RuntimeError):
+    pass
+
 class TCXDumper:
     TAB = '  '
 
@@ -104,3 +109,21 @@ class TCXDumper:
 
     def _dump_date(self, date):
         return date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+
+def dumper_for_file(filename):
+    parsers_map = {
+        'tcx': TCXDumper
+    }
+
+    _, extension = os.path.splitext(filename)
+    extension = extension[1:] # remove the leading '.'
+
+    try:
+        return parsers_map[extension]()
+    except KeyError:
+        raise DumperNotFoundError('Not dumper for extension: ' + extension)
+
+def dump_to_file(activity, filename):
+    dumper = dumper_for_file(filename)
+
+    return dumper.dump_to_file(activity, filename)

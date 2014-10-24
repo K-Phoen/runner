@@ -7,10 +7,6 @@ from fusion import Fusion
 from parser import parse_file
 
 
-cardio_activity = parse_file('data/2014-10-23_18-05-54_4_48.fit')
-dumper = TCXDumper()
-dumper.dump_to_file(cardio_activity, 'lala_fit.tcx')
-
 def date_to_timestamp(date):
     return int(time.mktime(date.timetuple()))
 
