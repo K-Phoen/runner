@@ -3,10 +3,13 @@
 from datetime import datetime
 
 class Activity:
-    def __init__(self, identifier = None):
-        self.identifier = identifier
+    def __init__(self):
         self.laps = []
         self._type = None
+
+    @property
+    def identifier(self):
+        return self.started_at
 
     @property
     def started_at(self):
@@ -58,10 +61,18 @@ class Lap:
         self.distance = 0 # in meters
         self.calories = 0
         self.max_speed = 0 # in meters per second
-        self.trigger_method = None
+        self._trigger_method = None
 
         self._avg_heart_rate = 0 # in bpm
         self._max_heart_rate = 0 # in bpm
+
+    @property
+    def trigger_method(self):
+        return self._trigger_method
+
+    @trigger_method.setter
+    def trigger_method(self, value):
+        self._trigger_method = value.title()
 
     @property
     def max_heart_rate(self):

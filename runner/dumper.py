@@ -11,7 +11,7 @@ class TCXDumper:
     def dump(self, activity):
         buffer = []
 
-        buffer.append('<?xml version="1.0" encoding="UTF-8"?>')
+        buffer.append('<?xml version="1.0" encoding="UTF-8"?>\n')
         buffer.append(self._dump_training_database(activity))
 
         return ''.join(buffer)
@@ -22,7 +22,7 @@ class TCXDumper:
     def _dump_training_database(self, activity):
         buffer = []
 
-        buffer.append("""<TrainingCenterDatabase version="1.0"
+        buffer.append("""<TrainingCenterDatabase
     xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd"
     xmlns:ns5="http://www.garmin.com/xmlschemas/ActivityGoals/v1"
     xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2"
@@ -52,7 +52,7 @@ class TCXDumper:
         buffer = []
 
         buffer.append(2*self.TAB + '<Activity Sport="%s">\n' % activity.type)
-        buffer.append(3*self.TAB + '<Id>%s</Id>\n' % activity.identifier)
+        buffer.append(3*self.TAB + '<Id>%s</Id>\n' % self._dump_date(activity.identifier))
         for lap in activity.laps:
             buffer.append(self._dump_lap(lap))
         buffer.append(2*self.TAB + '</Activity>\n')

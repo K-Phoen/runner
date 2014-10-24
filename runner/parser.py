@@ -3,7 +3,7 @@
 import fitparse, os
 from lxml import objectify
 
-import runner.model
+import runner.model as model
 
 class ParserNotFoundError(RuntimeError):
     pass
@@ -16,7 +16,8 @@ class TCXParser:
         return self._parse_activity(root.Activities.Activity)
 
     def _parse_activity(self, activity_xml):
-        activity = model.Activity(activity_xml.Id.pyval)
+        #activity = model.Activity(activity_xml.Id.pyval)
+        activity = model.Activity()
 
         # try to retrieve the activity type
         activity.type = activity_xml.get('Sport')
@@ -82,23 +83,25 @@ class FITParser:
             data_processor=fitparse.StandardUnitsDataProcessor(),
         )
         activity = model.Activity()
+        data = {}
 
         for message in fitfile.get_messages():
-            self._handle_message(message, activity)
+            self._handle_message(message, activity, data)
 
         return activity
 
-    def _handle_message(self, message, activity):
+    def _handle_message(self, message, activity, data):
         if message.name == 'activity':
-            activity.identifier = message.get('timestamp').value
+            data['trigger_method'] = message.get('type').value
         elif message.name == 'lap':
-            self._handle_lap(message, activity)
+            self._handle_lap(message, activity, data)
         elif message.name == 'record':
-            self._handle_record(message, activity)
+            self._handle_record(message, activity, data)
 
-    def _handle_lap(self, message, activity):
-        lap = model.Lap(message.get('timestamp').value)
+    def _handle_lap(self, message, activity, data):
+        lap = model.Lap(message.get('start_time').value)
 
+        lap.trigger_method = data['trigger_method']
         lap.duration = int(self._get_or_else(message, 'total_elapsed_time', 0))
         lap.distance = int(self._get_or_else(message, 'total_distance', 0))
         lap.calories = int(self._get_or_else(message, 'total_calories', 0))
@@ -109,7 +112,7 @@ class FITParser:
         activity.type = message.get('sport').value
         activity.laps.append(lap)
 
-    def _handle_record(self, message, activity):
+    def _handle_record(self, message, activity, data):
         trackpoint = model.Trackpoint(message.get('timestamp').value)
 
         trackpoint.heart_rate = int(self._get_or_else(message, 'heart_rate', 0))
