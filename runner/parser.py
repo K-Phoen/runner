@@ -3,7 +3,7 @@
 import fitparse, os
 from lxml import objectify
 
-import model
+import runner.model
 
 class ParserNotFoundError(RuntimeError):
     pass
@@ -135,7 +135,7 @@ def parser_for_file(filename):
     except KeyError:
         raise ParserNotFoundError('Not parser for extension: ' + extension)
 
-def parse_file(filename):
+def parse_from_file(filename):
     parser = parser_for_file(filename)
 
     return parser.parse(filename)
