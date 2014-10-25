@@ -5,6 +5,89 @@ import os
 class DumperNotFoundError(RuntimeError):
     pass
 
+class GPXDumper:
+    TAB = '  '
+
+    def dump(self, activity):
+        buffer = []
+
+        buffer.append('<?xml version="1.0" encoding="UTF-8"?>\n')
+        buffer.append(self._dump_training_database(activity))
+
+        return ''.join(buffer)
+
+    def dump_to_file(self, activity, filename):
+        open(filename, 'w').write(self.dump(activity))
+
+    def _dump_training_database(self, activity):
+        buffer = []
+
+        buffer.append("""<gpx version="1.1" creator="runner" xsi:schemaLocation="http://www.topografix.com/GPX/1/1
+                                http://www.topografix.com/GPX/1/1/gpx.xsd
+                                http://www.garmin.com/xmlschemas/GpxExtensions/v3
+                                http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd
+                                http://www.garmin.com/xmlschemas/TrackPointExtension/v1
+                                http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd"
+    xmlns="http://www.topografix.com/GPX/1/1"
+    xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+    xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+""")
+
+        buffer.append(self._dump_metadata(activity))
+        buffer.append(self._dump_activity(activity))
+        buffer.append('</gpx>')
+
+        return ''.join(buffer)
+
+    def _dump_metadata(self, activity):
+        buffer = []
+
+        buffer.append(self.TAB + '<metadata>\n')
+        buffer.append(2*self.TAB + '<time>%s</time>\n' % self._dump_date(activity.identifier))
+        buffer.append(self.TAB + '</metadata>\n')
+
+        return ''.join(buffer)
+
+    def _dump_activity(self, activity):
+        buffer = []
+
+        for lap in activity.laps:
+            buffer.append(self._dump_lap(lap))
+
+        return ''.join(buffer)
+
+    def _dump_lap(self, lap):
+        buffer = []
+
+        buffer.append(self.TAB + '<trk>\n')
+        buffer.append(2*self.TAB + '<trkseg>\n')
+
+        for trackpoint in lap.trackpoints:
+            buffer.append(self._dump_trackpoint(trackpoint))
+
+        buffer.append(2*self.TAB + '</trkseg>\n')
+        buffer.append(self.TAB + '</trk>\n')
+
+        return ''.join(buffer)
+
+    def _dump_trackpoint(self, trackpoint):
+        buffer = []
+
+        attrs = '' if trackpoint.position is None else ' lat="%.16f" lon="%.16f"' % (trackpoint.position.latitude, trackpoint.position.longitude)
+
+        buffer.append(3*self.TAB + '<trkpt%s>\n' % attrs)
+        buffer.append(4*self.TAB + '<time>%s</time>\n' % self._dump_date(trackpoint.time))
+        buffer.append(4*self.TAB + '<ele>%d</ele>\n' % trackpoint.altitude)
+
+        buffer.append(3*self.TAB + '</trkpt>\n')
+
+        return ''.join(buffer)
+
+    def _dump_date(self, date):
+        return date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+
+
 class TCXDumper:
     TAB = '  '
 
@@ -112,7 +195,8 @@ class TCXDumper:
 
 def dumper_for_file(filename):
     parsers_map = {
-        'tcx': TCXDumper
+        'tcx': TCXDumper,
+        'gpx': GPXDumper
     }
 
     _, extension = os.path.splitext(filename)
