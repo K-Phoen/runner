@@ -51,7 +51,7 @@ class TCXDumper:
     def _dump_activity(self, activity):
         buffer = []
 
-        buffer.append(2*self.TAB + '<Activity Sport="%s">\n' % activity.type)
+        buffer.append(2*self.TAB + '<Activity Sport="%s">\n' % "Running" if activity.type is None else activity.type)
         buffer.append(3*self.TAB + '<Id>%s</Id>\n' % self._dump_date(activity.identifier))
         for lap in activity.laps:
             buffer.append(self._dump_lap(lap))

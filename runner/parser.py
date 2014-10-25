@@ -8,6 +8,51 @@ import runner.model as model
 class ParserNotFoundError(RuntimeError):
     pass
 
+class GPXParser:
+    def parse(self, gpx_file):
+        tree = objectify.parse(gpx_file)
+        root = tree.getroot()
+
+        return self._parse_activity(root)
+
+    def _parse_activity(self, activity_xml):
+        activity = model.Activity()
+
+        for track in activity_xml.trk:
+            activity.laps.append(self._parse_track(track))
+
+        return activity
+
+    def _parse_track(self, track_xml):
+        track = model.Lap()
+
+        for segment in track_xml.trkseg:
+            for trackpoint in segment.trkpt:
+                track.trackpoints.append(self._parse_trackpoint(trackpoint))
+
+        track.duration = (track.end_time - track.start_time).total_seconds()
+
+        return track
+
+    def _parse_trackpoint(self, trackpoint_xml):
+        trackpoint = model.Trackpoint(trackpoint_xml.time.pyval)
+
+        trackpoint.altitude = self._get_or_else(trackpoint_xml, 'ele', 0)
+
+        if trackpoint_xml.get('lat') is not None and trackpoint_xml.get('lon') is not None:
+            trackpoint.position = model.Position(
+                float(trackpoint_xml.get('lat')),
+                float(trackpoint_xml.get('lon'))
+            )
+
+        return trackpoint
+
+    def _get_or_else(self, node, key, default = None):
+        try:
+            return node[key].pyval
+        except AttributeError:
+            return default
+
 class TCXParser:
     def parse(self, tcx_file):
         tree = objectify.parse(tcx_file)
@@ -127,6 +172,7 @@ class FITParser:
 def parser_for_file(filename):
     parsers_map = {
         'fit': FITParser,
+        'gpx': GPXParser,
         'tcx': TCXParser
     }
 

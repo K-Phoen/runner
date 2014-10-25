@@ -54,7 +54,7 @@ class Activity:
 
 class Lap:
     def __init__(self, start_time = None):
-        self.start_time = start_time if type(start_time) is datetime else datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S.%fZ')
+        self._start_time = start_time if start_time is None or type(start_time) is datetime else datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S.%fZ')
         self.trackpoints = []
 
         self.duration = 0 # in seconds
@@ -65,6 +65,19 @@ class Lap:
 
         self._avg_heart_rate = 0 # in bpm
         self._max_heart_rate = 0 # in bpm
+
+    @property
+    def end_time(self):
+        return max(trackpoint.time for trackpoint in self.trackpoints)
+
+    @property
+    def start_time(self):
+        return self._start_time if self._start_time is not None else \
+               min(trackpoint.time for trackpoint in self.trackpoints)
+
+    @start_time.setter
+    def start_time(self, value):
+        self._start_time  = start_time if start_time is None or type(start_time) is datetime else datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S.%fZ')
 
     @property
     def trigger_method(self):
