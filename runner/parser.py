@@ -45,6 +45,12 @@ class GPXParser:
                 float(trackpoint_xml.get('lon'))
             )
 
+        for child in trackpoint_xml.extensions:
+            heart_rate = child.find('.//gpxtpx:hr', namespaces={'gpxtpx': child.nsmap['gpxtpx']})
+
+            if heart_rate is not None:
+                trackpoint.heart_rate = heart_rate
+
         return trackpoint
 
     def _get_or_else(self, node, key, default = None):

@@ -79,7 +79,9 @@ class GPXDumper:
         buffer.append(3*self.TAB + '<trkpt%s>\n' % attrs)
         buffer.append(4*self.TAB + '<time>%s</time>\n' % self._dump_date(trackpoint.time))
         buffer.append(4*self.TAB + '<ele>%d</ele>\n' % trackpoint.altitude)
-
+        buffer.append(4*self.TAB + '<gpxtpx:TrackPointExtension>\n')
+        buffer.append(5*self.TAB + '<gpxtpx:hr>%d</gpxtpx:hr>\n' % trackpoint.heart_rate)
+        buffer.append(4*self.TAB + '</gpxtpx:TrackPointExtension>\n')
         buffer.append(3*self.TAB + '</trkpt>\n')
 
         return ''.join(buffer)
