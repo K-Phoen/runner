@@ -32,6 +32,7 @@ runner-edit time -i activity.tcx -o activity_edited.tcx --time='+2hour'
 ### runner-merge
 
 Merge the heart rate data from a file into another activity.
+Missing heart rate data is interpolated usign [pandas](http://pandas.pydata.org/).
 
 ```
 runner-merge -m main_activity.tcx -c cardio_activity.tcx -o merged.tcx
