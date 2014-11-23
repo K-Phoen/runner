@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
 import operator, re
-from datetime import datetime, timedelta
-
-class EditorNotFoundError(RuntimeError):
-    pass
+from datetime import timedelta
 
 class TimeEditor:
+    TIME_REGEX = r'(?P<sign>(\+|\-)?)((?P<hours>\d+?)hour)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?'
+
     @classmethod
     def configure_args_parser(cls, parser):
         parser.add_argument(
@@ -16,16 +15,16 @@ class TimeEditor:
         parser.set_defaults(editor=lambda: TimeEditor())
 
     def edit(self, activity, options):
-        op, delta = self._parse_time_delta(options.time)
+        operator, delta = self._parse_time_delta(options.time)
 
         for lap in activity.laps:
-            lap.start_time = op(lap.start_time, delta)
+            lap.start_time = operator(lap.start_time, delta)
 
             for trackpoint in lap.trackpoints:
-                trackpoint.time = op(trackpoint.time, delta)
+                trackpoint.time = operator(trackpoint.time, delta)
 
     def _parse_time_delta(self, string):
-        regex = re.compile(r'(?P<sign>(\+|\-)?)((?P<hours>\d+?)hour)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?')
+        regex = re.compile(TimeEditor.TIME_REGEX)
         parts = regex.match(string)
 
         if not parts:
@@ -35,7 +34,6 @@ class TimeEditor:
         sign = operator.sub if parts['sign'] == '-' else operator.add
         del parts['sign']
 
-        #time_params = {name: int(param) for (name, param) in parts.items() if param}
         time_params = {}
         for (name, param) in parts.items():
             if param:

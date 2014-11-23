@@ -2,6 +2,9 @@
 
 import os
 
+def dump_date(date):
+    return date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+
 class DumperNotFoundError(RuntimeError):
     pass
 
@@ -44,7 +47,7 @@ class GPXDumper:
         buffer = []
 
         buffer.append(self.TAB + '<metadata>\n')
-        buffer.append(2*self.TAB + '<time>%s</time>\n' % self._dump_date(activity.identifier))
+        buffer.append(2*self.TAB + '<time>%s</time>\n' % dump_date(activity.identifier))
         buffer.append(self.TAB + '</metadata>\n')
 
         return ''.join(buffer)
@@ -77,7 +80,7 @@ class GPXDumper:
         attrs = '' if trackpoint.position is None else ' lat="%.16f" lon="%.16f"' % (trackpoint.position.latitude, trackpoint.position.longitude)
 
         buffer.append(3*self.TAB + '<trkpt%s>\n' % attrs)
-        buffer.append(4*self.TAB + '<time>%s</time>\n' % self._dump_date(trackpoint.time))
+        buffer.append(4*self.TAB + '<time>%s</time>\n' % dump_date(trackpoint.time))
         buffer.append(4*self.TAB + '<ele>%d</ele>\n' % trackpoint.altitude)
         buffer.append(4*self.TAB + '<gpxtpx:TrackPointExtension>\n')
         buffer.append(5*self.TAB + '<gpxtpx:hr>%d</gpxtpx:hr>\n' % trackpoint.heart_rate)
@@ -85,9 +88,6 @@ class GPXDumper:
         buffer.append(3*self.TAB + '</trkpt>\n')
 
         return ''.join(buffer)
-
-    def _dump_date(self, date):
-        return date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
 
 class TCXDumper:
@@ -137,7 +137,7 @@ class TCXDumper:
         buffer = []
 
         buffer.append(2*self.TAB + '<Activity Sport="%s">\n' % "Running" if activity.type is None else activity.type)
-        buffer.append(3*self.TAB + '<Id>%s</Id>\n' % self._dump_date(activity.identifier))
+        buffer.append(3*self.TAB + '<Id>%s</Id>\n' % dump_date(activity.identifier))
         for lap in activity.laps:
             buffer.append(self._dump_lap(lap))
         buffer.append(2*self.TAB + '</Activity>\n')
@@ -147,7 +147,7 @@ class TCXDumper:
     def _dump_lap(self, lap):
         buffer = []
 
-        buffer.append(3*self.TAB + '<Lap StartTime="%s">\n' % self._dump_date(lap.start_time))
+        buffer.append(3*self.TAB + '<Lap StartTime="%s">\n' % dump_date(lap.start_time))
         buffer.append(4*self.TAB + '<TotalTimeSeconds>%d</TotalTimeSeconds>\n' % lap.duration)
         buffer.append(4*self.TAB + '<DistanceMeters>%d</DistanceMeters>\n' % lap.distance)
         buffer.append(4*self.TAB + '<Calories>%d</Calories>\n' % lap.calories)
@@ -170,7 +170,7 @@ class TCXDumper:
         buffer = []
 
         buffer.append(5*self.TAB + '<Trackpoint>\n')
-        buffer.append(6*self.TAB + '<Time>%s</Time>\n' % self._dump_date(trackpoint.time))
+        buffer.append(6*self.TAB + '<Time>%s</Time>\n' % dump_date(trackpoint.time))
         buffer.append(6*self.TAB + '<DistanceMeters>%d</DistanceMeters>\n' % trackpoint.distance)
         buffer.append(6*self.TAB + '<AltitudeMeters>%d</AltitudeMeters>\n' % trackpoint.altitude)
         buffer.append(6*self.TAB + '<HeartRateBpm><Value>%d</Value></HeartRateBpm>\n' % trackpoint.heart_rate)
@@ -191,9 +191,6 @@ class TCXDumper:
         buffer.append(6*self.TAB + '</Position>\n')
 
         return ''.join(buffer)
-
-    def _dump_date(self, date):
-        return date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
 def dumper_for_file(filename):
     parsers_map = {

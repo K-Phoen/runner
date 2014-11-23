@@ -53,7 +53,7 @@ class GPXParser:
 
         return trackpoint
 
-    def _get_or_else(self, node, key, default = None):
+    def _get_or_else(self, node, key, default=None):
         try:
             return node[key].pyval
         except AttributeError:
@@ -81,10 +81,10 @@ class TCXParser:
     def _parse_lap(self, lap_xml):
         lap = model.Lap(lap_xml.get('StartTime'))
 
-        lap.duration       = self._get_or_else(lap_xml, 'TotalTimeSeconds', 0) # in seconds
-        lap.distance       = self._get_or_else(lap_xml, 'DistanceMeters', 0)  # in meters
-        lap.calories       = self._get_or_else(lap_xml, 'Calories', 0)
-        lap.max_speed      = self._get_or_else(lap_xml, 'MaximumSpeed', 0) # in meters per second
+        lap.duration = self._get_or_else(lap_xml, 'TotalTimeSeconds', 0) # in seconds
+        lap.distance = self._get_or_else(lap_xml, 'DistanceMeters', 0)  # in meters
+        lap.calories = self._get_or_else(lap_xml, 'Calories', 0)
+        lap.max_speed = self._get_or_else(lap_xml, 'MaximumSpeed', 0) # in meters per second
         lap.trigger_method = self._get_or_else(lap_xml, 'TriggerMethod', None)
 
         lap.avg_heart_rate = self._parse_heart_rate_bpm(lap_xml, 'AverageHeartRateBpm')
@@ -98,8 +98,8 @@ class TCXParser:
     def _parse_trackpoint(self, trackpoint_xml):
         trackpoint = model.Trackpoint(trackpoint_xml.Time.pyval)
 
-        trackpoint.distance   = self._get_or_else(trackpoint_xml, 'DistanceMeters', 0)
-        trackpoint.altitude   = self._get_or_else(trackpoint_xml, 'AltitudeMeters', 0)
+        trackpoint.distance = self._get_or_else(trackpoint_xml, 'DistanceMeters', 0)
+        trackpoint.altitude = self._get_or_else(trackpoint_xml, 'AltitudeMeters', 0)
         trackpoint.heart_rate = self._parse_heart_rate_bpm(trackpoint_xml, 'HeartRateBpm')
 
         try:
@@ -115,13 +115,13 @@ class TCXParser:
             self._get_or_else(position_xml, 'LongitudeDegrees', 0)
         )
 
-    def _parse_heart_rate_bpm(self, node, key, default = 0):
+    def _parse_heart_rate_bpm(self, node, key, default=0):
         try:
             return node[key].Value.pyval
         except AttributeError:
             return default
 
-    def _get_or_else(self, node, key, default = None):
+    def _get_or_else(self, node, key, default=None):
         try:
             return node[key].pyval
         except AttributeError:

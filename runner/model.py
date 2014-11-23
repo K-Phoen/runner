@@ -53,7 +53,7 @@ class Activity:
         )
 
 class Lap:
-    def __init__(self, start_time = None):
+    def __init__(self, start_time=None):
         self._start_time = start_time if start_time is None or type(start_time) is datetime else datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S.%fZ')
         self.trackpoints = []
 
@@ -77,7 +77,8 @@ class Lap:
 
     @start_time.setter
     def start_time(self, value):
-        self._start_time  = start_time if start_time is None or type(start_time) is datetime else datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S.%fZ')
+        self._start_time = value if value is None or type(value) is datetime \
+                           else datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%fZ')
 
     @property
     def trigger_method(self):
@@ -105,10 +106,6 @@ class Lap:
     def avg_heart_rate(self, value):
         self._avg_heart_rate = value
 
-    @property
-    def end_time(self):
-        return max(trackpoint.time for trackpoint in self.trackpoints)
-
     def __repr__(self):
         return '<Lap: started at %s; duration %d sec; %d meters (%d trackpoints)>' % (
             self.start_time,
@@ -118,7 +115,7 @@ class Lap:
         )
 
 class Trackpoint:
-    def __init__(self, time = None):
+    def __init__(self, time=None):
         self.time = time if type(time) is datetime else datetime.strptime(time, '%Y-%m-%dT%H:%M:%S.%fZ')
         self.distance = 0 # in meters
         self.altitude = 0 # in meters
