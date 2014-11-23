@@ -3,19 +3,7 @@
 import argparse, time
 from runner import dump_to_file, parse_from_file, Fusion
 
-def date_to_timestamp(date):
-    return int(time.mktime(date.timetuple()))
-
-def report(activity, name):
-    timestamp_start = date_to_timestamp(activity.started_at)
-    timestamp_end = date_to_timestamp(activity.completed_at)
-
-    print('------------- %s -------------' % name)
-    print('Total distance: %d meters' % activity.distance)
-    print('Started at: %s (%d)' % (activity.started_at, timestamp_start))
-    print('Completed at: %s (%d)\n' % (activity.completed_at, timestamp_end))
-
-def parse_args(args=None):
+def parse_args():
     parser = argparse.ArgumentParser(
         description='Merge two activity files'
     )
@@ -40,10 +28,6 @@ def main():
     # read the files
     main_activity = parse_from_file(options.main)
     cardio_activity = parse_from_file(options.cardio)
-
-    # print a few info on the two activities
-#    report(main_activity, 'MAIN')
-#    report(cardio_activity, 'CARDIO')
 
     # start the fusion
     fusion = Fusion()

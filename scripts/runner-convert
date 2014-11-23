@@ -3,7 +3,7 @@
 import argparse
 from runner import dump_to_file, parse_from_file
 
-def parse_args(args=None):
+def parse_args():
     parser = argparse.ArgumentParser(
         description='Convert FIT and TCX files'
     )
@@ -16,7 +16,7 @@ def parse_args(args=None):
         help='File to write the output to.',
     )
 
-    return parser.parse_args(args)
+    return parser.parse_args()
 
 def main():
     options = parse_args()
